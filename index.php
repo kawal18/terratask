@@ -1,0 +1,5 @@
+<php>
+
+ipconfig;
+
+</php>
