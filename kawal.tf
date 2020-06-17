@@ -7,22 +7,22 @@ region = "ap-south-1"
 
 resource "aws_instance" "myin" {
 
-ami         = "ami-052c08d70def0ac62"
+ami         = "ami-0447a12f28fddb066"
 instance_type = "t2.micro"
 key_name     =  "dockerkey"
- security_groups = [ "launch-wizard-2" ]
+security_groups = [ "launch-wizard-2" ]
 
 
  connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("C:/Users/MINNY/Downloads/dockerkey.pem")
+    private_key = file("C:/Users/meme/Downloads/terratask-master/terratask-master/dockerkey.pem")
     host     = aws_instance.myin.public_ip
   }
 
 provisioner "remote-exec" {
     inline = [
-      "sudo yum install httpd  php git -y",
+      "sudo yum install httpd git -y",
       "sudo systemctl restart httpd",
       "sudo systemctl enable httpd",
     ]
@@ -64,7 +64,7 @@ depends_on = [
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("C:/Users/MINNY/Downloads/dockerkey.pem")
+    private_key = file("C:/Users/meme/Downloads/terratask-master/terratask-master/dockerkey.pem")
     host     = aws_instance.myin.public_ip
   }
 
@@ -77,9 +77,6 @@ provisioner "remote-exec" {
     ]
   }
 }
-
-
-
 
 
 resource "aws_s3_bucket" "kawal18899" {
@@ -118,7 +115,7 @@ aws_s3_bucket.kawal18899
 
 bucket = aws_s3_bucket.kawal18899.id
 key = "terrafrom_pic.jpg"
-source = "C:/Users/MINNY/Desktop/terrafrom_pic.jpg"
+source = "C:/Users/meme/Downloads/terratask-master/terratask-master/terrafrom_pic.jpg"
 acl    = "public-read"
 content_type = "image/jpg"
 
@@ -141,6 +138,15 @@ resource "aws_cloudfront_distribution" "mycf" {
     }
        
     enabled = true
+  is_ipv6_enabled     = true
+  comment             = "This is image"
+  default_root_object = "terrafrom_pic.jpg"
+
+  logging_config {
+    include_cookies = false
+    bucket          = aws_s3_bucket.kawal18899.bucket_domain_name
+  
+  }
 
 
     default_cache_behavior {
@@ -189,18 +195,28 @@ depends_on = [
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("C:/Users/MINNY/Downloads/dockerkey.pem")
+    private_key = file("C:/Users/meme/Downloads/terratask-master/terratask-master/dockerkey.pem")
     host     = aws_instance.myin.public_ip
   }
 
 provisioner "remote-exec" {
-    inline = [
-
-" echo\"<img src ='https://${aws_cloudfront_distribution.mycf.domain_name}/terrafrom_pic.jpg' width = '400' length = '400'>\" | sudo tee -a /var/www/html/index.php", "sudo systemctl start httpd"
-
-]
+           inline = [
+    "echo \"<img src='https://${aws_cloudfront_distribution.mycf.domain_name}/terrafrom_pic.jpg' width='300' lenght='400' >\"  | sudo tee -a /var/www/html/index.html",
+ 
+    "sudo systemctl start httpd"
+                    ]
+                           }
 }
+
+
+
+
+output "out1" {
+value = aws_cloudfront_distribution.mycf.domain_name
 }
+
+
+
 
 
 
